@@ -18,8 +18,9 @@ void drawBoard(){ //prints board to terminal
 
 
 void unmakeMove(int digit, char board[3][3]){
-    char d = digit;
-    board[(digit-1)/3][(digit-1)%3] = d;
+    int i = (digit-1)/3;
+    int j = (digit-1)%3;
+    board[i][j] = '0' + digit;
 }
 
 int playerInput(){
@@ -117,43 +118,6 @@ bool checkDraw(char board[3][3]){
     return false;
 }
 
-
-
-
-
-/*
-int miniMax(char board[3][3]){
-    auto max_value = [](){
-        if (terminal(board)){
-            return utility(board);
-        }
-        int v = -9999;
-        std::set<int> actions = actions(board);
-        for (i = actions.begin(); i != actions.end(); i++){
-            if (min_value(makeMove(i, board)) > v){
-                v = min_value(makeMove(i, board));
-            }
-            unmakeMove(i, board);
-        }
-        return v;
-    };
-    auto min_value = [](){
-        if (terminal(board)){
-            return utility(board);
-        }
-        int v = 9999;
-        std::set<int> actions = actions(board);
-        for (i = actions.begin(); i != actions.end(); i++){
-            if (min_value(makeMove(i, board)) < v){
-                v = min_value(makeMove(i, board));
-            }
-            unmakeMove(i, board);
-        }
-        return v;
-    };
-    return max_value(board);
-}
-*/
 
 int miniMax(char board[3][3], bool isMaximizingPlayer = true){
 
