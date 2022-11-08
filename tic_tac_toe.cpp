@@ -36,22 +36,27 @@ int playerInput(){
 
 std::vector<int> actions(char board[3][3]){
     //returns set of possible moves
-    std::vector<int> actions;
-    for (int i; i<3; i++){
-        for (int j; j<3; j++){
+    std::vector<int> actions{};
+    for (int i{}; i<3; i++){
+        for (int j{}; j<3; j++){
             if (board[i][j] != 'X' && board[i][j] != 'O'){
                 actions.push_back(i+1+j*3);
             }
         }
     }
+    std::cout << '[';
+    for (int i: actions)
+    std::cout << i << ' ';
+    std::cout << ']';
+
     return actions;
 }
 
 char player(char board[3][3]){
     int xcount{};
     int ocount{};
-    for (int i; i<3; i++){
-        for (int j; j<3; j++){
+    for (int i{}; i<3; i++){
+        for (int j{}; j<3; j++){
             if (board[i][j] == 'X'){
                 xcount++;
             }
@@ -75,7 +80,7 @@ void makeMove(int digit, char board[3][3]){
 
 
 bool terminal(char board[3][3]){
-    for (int i; i<3; i++){
+    for (int i{}; i<3; i++){
         //row check
         if (board[i][0] == board[i][1] &&
             board[i][1] == board[i][2]){
@@ -120,6 +125,7 @@ bool checkDraw(char board[3][3]){
 
 
 int miniMax(char board[3][3], bool isMaximizingPlayer = true){
+    
 
     if (terminal(board)){
         return utility(board);
@@ -153,7 +159,6 @@ int findBestMove(char board[3][3]){
     int bestVal{9999};
     std::vector<int> moves = actions(board);
     int bestAct{};
-    //for (i = actions.begin(); i != actions.end(); i++){
     for (int i{}; i < moves.size(); i++){
         int move = moves[i];
         makeMove(move, board);
@@ -164,6 +169,10 @@ int findBestMove(char board[3][3]){
         }
         unmakeMove(move, board);
     }
+    for (int i{}; i<moves.size(); i++){
+
+        std::cout << moves[i] << std::endl;
+    }
     return bestAct;
 }
 
@@ -173,13 +182,14 @@ int main(){
         drawBoard();
         makeMove(playerInput(), gamestate);
         if (terminal(gamestate) || checkDraw(gamestate)){
-            break;
+            running = false;
         }
-
-        makeMove(findBestMove(gamestate), gamestate);
+    
+        makeMove(findBestMove(gamestate), gamestate); //failing here
         if (terminal(gamestate)){
             running = false;
         }
+        
 
     }
     drawBoard();
