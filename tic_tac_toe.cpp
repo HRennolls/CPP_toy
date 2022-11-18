@@ -7,7 +7,7 @@
 char gamestate[3][3] = {{'1', '2', '3'}, {'4', '5', '6'}, {'7', '8', '9'}};
 
 
-void drawBoard(){ //prints board to terminal
+void drawBoard(char board[3][3]){ //prints board to terminal
     std::cout << " " << gamestate[0][0] << " | " << gamestate[0][1] << " | " << gamestate[0][2] << std::endl;
     std::cout << "___________" << std::endl;
     std::cout << " " << gamestate[1][0] << " | " << gamestate[1][1] << " | " << gamestate[1][2] << std::endl;
@@ -18,9 +18,7 @@ void drawBoard(){ //prints board to terminal
 
 
 void unmakeMove(int digit, char board[3][3]){
-    int i = (digit-1)/3;
-    int j = (digit-1)%3;
-    board[i][j] = '0' + digit;
+    board[(digit-1)/3][(digit-1)%3] = '0' + digit;
 }
 
 int playerInput(){
@@ -44,11 +42,6 @@ std::vector<int> actions(char board[3][3]){
             }
         }
     }
-    std::cout << '[';
-    for (int i: actions)
-    std::cout << i << ' ';
-    std::cout << ']';
-
     return actions;
 }
 
@@ -132,24 +125,55 @@ int miniMax(char board[3][3], bool isMaximizingPlayer = true){
         }
     if (isMaximizingPlayer){
         int bestVal = -9999;
-        std::vector<int> moves = actions(board);
+        //std::vector<int> moves = actions(board);
+        for (int i{}; i<3; i++){
+            for (int j{}; j<3; j++){
+                if (board[i][j] != 'X' && board[i][j] != 'O'){
+                    //makeMove(board[i][j], board);
+                    board[i][j] = player(board);
+                    int value = miniMax(board, false);
+                    int bestVal = new_max( bestVal, value);
+                    //unmakeMove(board[i][j], board);
+                    board[i][j] = '0' + i*3+1+j;
+                    }
+                }
+            }
+
+        /*
         for (int i{}; i< moves.size(); i++){
             makeMove(moves[i], board);
             int value = miniMax(board, false);
             int bestVal = new_max( bestVal, value);
             unmakeMove(moves[i], board);
-            }
+            }*/
+            
         return bestVal;
     }
     else {
         int bestVal = 9999;
-        std::vector<int> moves = actions(board);
+        //std::vector<int> moves = actions(board);
+
+        for (int i{}; i<3; i++){
+            for (int j{}; j<3; j++){
+                if (board[i][j] != 'X' && board[i][j] != 'O'){
+                    //makeMove(board[i][j], board);
+                    char temp{board[i][j]};
+                    board[i][j] = player(board);
+                    int value = miniMax(board, true);
+                    int bestVal = new_min(bestVal, value);
+                    //unmakeMove(board[i][j], board);
+                    board[i][j] = '0' + i*3+1+j;
+                    }
+                }
+            }
+
+        /*
         for (int i{}; i<moves.size(); i++){
             makeMove(moves[i], board);
             int value = miniMax(board, true);
             int bestVal = new_min( bestVal, value);
             unmakeMove(moves[i], board);
-        }
+        }*/
         return bestVal;
     }
 }
@@ -169,17 +193,15 @@ int findBestMove(char board[3][3]){
         }
         unmakeMove(move, board);
     }
-    for (int i{}; i<moves.size(); i++){
-
-        std::cout << moves[i] << std::endl;
-    }
     return bestAct;
 }
 
 int main(){
+
+    
     bool running{true};
     while (running){
-        drawBoard();
+        drawBoard(gamestate);
         makeMove(playerInput(), gamestate);
         if (terminal(gamestate) || checkDraw(gamestate)){
             running = false;
@@ -189,10 +211,7 @@ int main(){
         if (terminal(gamestate)){
             running = false;
         }
-        
-
     }
-    drawBoard();
 
     return 0;
 }
