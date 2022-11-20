@@ -13,6 +13,9 @@ void drawBoard(char board[3][3]){ //prints board to terminal
     std::cout << " " << gamestate[1][0] << " | " << gamestate[1][1] << " | " << gamestate[1][2] << std::endl;
     std::cout << "___________" << std::endl;
     std::cout << " " << gamestate[2][0] << " | " << gamestate[2][1] << " | " << gamestate[2][2] << std::endl;
+    std::cout <<std::endl;
+    std::cout <<std::endl;
+    std::cout <<std::endl;
 }
 
 
@@ -71,29 +74,49 @@ void makeMove(int digit, char board[3][3]){
     board[(digit-1)/3][(digit-1)%3] = player(board);
 }
 
+bool checkDraw(char board[3][3]){
+    int count{};
+    for (int i{}; i<3; i++){
+        for (int j{}; j<3; j++){
+            if (board[i][j]=='X'||board[i][j]=='O'){
+                count++;
+            }
+        }
+    }
+    if (count == 9){;
+        return true;}
+    return false;
+}
 
-bool terminal(char board[3][3]){
+char terminal(char board[3][3]){
     for (int i{}; i<3; i++){
         //row check
         if (board[i][0] == board[i][1] &&
-            board[i][1] == board[i][2]){
-            return true;
+            board[i][1] == board[i][2] &&
+            (board[i][0] == 'X' || board[i][0] == 'O')){
+                return board[i][0];
             }
         //column check
         if (board[0][i] == board[1][i] &&
-            board[1][i] == board[2][i]){
-            return true;
+            board[1][i] == board[2][i] &&
+            (board[0][i] == 'X' || board[0][i] == 'O')){
+                return board[0][i];
             }   
         }
     if (board[0][0] == board[1][1] &&
-        board[1][1] == board[2][2]){
-            return true;
+        board[1][1] == board[2][2] &&
+        (board[1][1] == 'X' || board[1][1] == 'O')){
+            return board[1][1];
         }
     if (board[2][0] == board[1][1] &&
-        board[1][1] == board[0][2]){
-            return true;
+        board[1][1] == board[0][2] &&
+        (board[1][1] == 'X' || board[1][1] == 'O')){
+            return board[1][1];
         }
-    return false;
+    if (checkDraw(board)){
+        return 'd';
+    }
+    return 'n';
     }
 
 
@@ -103,77 +126,43 @@ int utility(char board[3][3]){
     else    {return 0;}
 }
 
-bool checkDraw(char board[3][3]){
-    int count{};
-    for (int i{}; i<9; i++){
-        for (int j{}; j<9; j++){
-            if (board[i][j]=='X'||board[i][j]=='O'){
-                count++;
-            }
-        }
-    }
-    if (count == 9){return true;}
-    return false;
-}
+
 
 
 int miniMax(char board[3][3], bool isMaximizingPlayer = true){
-    
 
-    if (terminal(board)){
+    if (terminal(board) != 'n'){
         return utility(board);
         }
     if (isMaximizingPlayer){
         int bestVal = -9999;
-        //std::vector<int> moves = actions(board);
+
         for (int i{}; i<3; i++){
             for (int j{}; j<3; j++){
                 if (board[i][j] != 'X' && board[i][j] != 'O'){
-                    //makeMove(board[i][j], board);
                     board[i][j] = player(board);
                     int value = miniMax(board, false);
-                    int bestVal = new_max( bestVal, value);
-                    //unmakeMove(board[i][j], board);
+                    bestVal = new_max( bestVal, value);
                     board[i][j] = '0' + i*3+1+j;
                     }
                 }
             }
-
-        /*
-        for (int i{}; i< moves.size(); i++){
-            makeMove(moves[i], board);
-            int value = miniMax(board, false);
-            int bestVal = new_max( bestVal, value);
-            unmakeMove(moves[i], board);
-            }*/
-            
         return bestVal;
     }
     else {
         int bestVal = 9999;
-        //std::vector<int> moves = actions(board);
 
         for (int i{}; i<3; i++){
             for (int j{}; j<3; j++){
                 if (board[i][j] != 'X' && board[i][j] != 'O'){
-                    //makeMove(board[i][j], board);
-                    char temp{board[i][j]};
                     board[i][j] = player(board);
                     int value = miniMax(board, true);
-                    int bestVal = new_min(bestVal, value);
-                    //unmakeMove(board[i][j], board);
-                    board[i][j] = '0' + i*3+1+j;
+                    bestVal = new_min(bestVal, value);
+                    board[i][j] = '0' + i*3+j+1;
+                    
                     }
                 }
             }
-
-        /*
-        for (int i{}; i<moves.size(); i++){
-            makeMove(moves[i], board);
-            int value = miniMax(board, true);
-            int bestVal = new_min( bestVal, value);
-            unmakeMove(moves[i], board);
-        }*/
         return bestVal;
     }
 }
@@ -181,37 +170,47 @@ int miniMax(char board[3][3], bool isMaximizingPlayer = true){
 
 int findBestMove(char board[3][3]){
     int bestVal{9999};
-    std::vector<int> moves = actions(board);
     int bestAct{};
-    for (int i{}; i < moves.size(); i++){
-        int move = moves[i];
-        makeMove(move, board);
-        int score = miniMax(board);
-        if (score < bestVal){
-            bestVal = score;
-            bestAct = move;
+
+    for (int i{}; i<3; i++){
+            for (int j{}; j<3; j++){
+                if (board[i][j] != 'X' && board[i][j] != 'O'){
+                    board[i][j] = player(board);
+                    int value{miniMax(board, true)};
+                    if (value < bestVal){
+                        bestVal = value;
+                        bestAct = i*3+j+1;
+                    }
+                    board[i][j] = '0' + i*3+j+1;
+                }
+            }
         }
-        unmakeMove(move, board);
-    }
+    
     return bestAct;
 }
 
 int main(){
-
-    
     bool running{true};
     while (running){
         drawBoard(gamestate);
         makeMove(playerInput(), gamestate);
-        if (terminal(gamestate) || checkDraw(gamestate)){
-            running = false;
+        if (terminal(gamestate) != 'n'){ 
+            break;
         }
+        
     
-        makeMove(findBestMove(gamestate), gamestate); //failing here
-        if (terminal(gamestate)){
-            running = false;
+        makeMove(findBestMove(gamestate), gamestate);
+        if (terminal(gamestate) != 'n'){
+            break;
         }
     }
 
+    drawBoard(gamestate);
+    if (terminal(gamestate) != 'd'){
+        std::cout << terminal(gamestate) << " won!";
+    }
+    else {
+        std::cout << "Draw!";
+    }
     return 0;
 }
